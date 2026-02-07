@@ -1,0 +1,30 @@
+package thaithienthuan.lab02.service;
+
+import org.springframework.stereotype.Service;
+import thaithienthuan.lab02.model.Category;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class CategoryService {
+
+    private final List<Category> categories = new ArrayList<>();
+
+    public CategoryService() {
+        categories.add(new Category(1, "Điện thoại"));
+        categories.add(new Category(2, "Laptop"));
+        categories.add(new Category(3, "Phụ kiện"));
+    }
+
+    public List<Category> getAll() {
+        return categories;
+    }
+
+    public Category get(int id) {
+        return categories.stream()
+                .filter(c -> c.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+}

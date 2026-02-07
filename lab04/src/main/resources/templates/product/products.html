@@ -1,0 +1,59 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+
+<body>
+<div layout:fragment="content" class="container body-content">
+
+    <h2 class="mb-3">Product List</h2>
+
+    <a th:href="@{/products/create}" class="btn btn-primary mb-3">
+        Add Product
+    </a>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+        <tr>
+            <th>ID </th>
+            <th>Name </th>
+            <th>Price </th>
+            <th>Image </th>
+            <th>Category </th>
+            <th>Action </th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="product : ${listproduct}">
+            <td th:text="${product.id}"></td>
+            <td th:text="${product.name}"></td>
+            <td th:text="${product.price}"></td>
+
+            <td>
+                <img th:if="${product.image != null}"
+                     th:src="@{/images/{img}(img=${product.image})}"
+                     width="80">
+            </td>
+
+            <td th:text="${product.category != null ? product.category.name : ''}">
+            </td>
+
+            <td>
+                <a th:href="@{/products/edit/{id}(id=${product.id})}"
+                   class="btn btn-warning btn-sm">
+                    Edit
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>
