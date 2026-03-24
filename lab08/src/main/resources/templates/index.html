@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Home - Course Registration</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                url('https://www.skillstrainingcentre.co.uk/uploads/assets/Blogs/2022/training-courses-800x400.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #333;
+        }
+
+        /* MAIN CONTAINER */
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        /* PROMO BANNER */
+        .promo {
+            background: linear-gradient(135deg, #ff4d4d, #ff9966);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .promo h2 {
+            margin: 0;
+            font-weight: bold;
+        }
+
+        /* CARD */
+        .card {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
+        }
+
+        /* BUTTON */
+        .btn {
+            border-radius: 8px;
+        }
+
+        /* FOOTER */
+        footer {
+            margin-top: 40px;
+            padding: 15px;
+            text-align: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        footer span {
+            opacity: 0.8;
+        }
+
+        /* pagination */
+        .pagination {
+            justify-content: center;
+            margin-top: 2rem;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container mt-4">
+
+        <div class="main-content">
+
+            <!-- PROMO -->
+            <div class="promo">
+                <h2>🔥 Nhận ngay 50% ưu đãi !!!</h2>
+                <p>Đăng ký ngay hôm nay để không bỏ lỡ cơ hội</p>
+            </div>
+
+            <!-- HEADER -->
+            <!-- SEARCH BAR -->
+            <form th:action="@{/search}" method="get" class="mb-4">
+                <div class="input-group">
+
+                    <input type="text" name="keyword" class="form-control" placeholder="Search courses...">
+                    <button class="btn btn-primary" type="submit">
+                        🔍 Search
+                    </button>
+
+                </div>
+            </form>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>Available Courses</h3>
+
+                <a th:href="@{/admin/courses/add}" class="btn btn-primary" sec:authorize="hasAuthority('ROLE_ADMIN')">
+                    + Add Course
+                </a>
+            </div>
+
+            <!-- EMPTY -->
+            <div th:if="${courses.isEmpty()}" class="alert alert-info">
+                No courses available.
+                <!-- SORT -->
+            </div>
+            <form method="get" th:action="@{/home}" class="mb-3">
+                <div class="row">
+                    <!-- Sort -->
+                    <div class="col-md-4">
+                        <select name="sort" class="form-select" onchange="this.form.submit()">
+                            <option value="default" th:selected="${sort == 'default'}">Mặc định</option>
+                            <option value="price_asc" th:selected="${sort == 'price_asc'}">Giá tăng dần</option>
+                            <option value="price_desc" th:selected="${sort == 'price_desc'}">Giá giảm dần</option>
+                        </select>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="col-md-4">
+                        <select name="categoryId" class="form-select" onchange="this.form.submit()">
+                            <option value="0" th:selected="${categoryId == 0}">Tất cả category</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"
+                                th:selected="${categoryId == cat.id}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+            <!-- LIST -->
+            <div class="row" th:unless="${courses.isEmpty()}">
+
+                <div class="col-lg-4 col-md-6 mb-4" th:each="c : ${courses}">
+
+                    <div class="card h-100">
+
+                        <img th:src="@{/images/icon.png}" class="card-img-top">
+
+                        <div class="card-body d-flex flex-column">
+
+                            <h5 th:text="${c.name}"></h5>
+
+                            <p><strong>Credits:</strong> <span th:text="${c.credits}"></span></p>
+                            <p><strong>Lecturer:</strong> <span th:text="${c.lecturer}"></span></p>
+
+                            <p th:if="${c.category}">
+                                <strong>Category:</strong>
+                                <span th:text="${c.category.name}"></span>
+                            </p>
+                            <p><strong>Price:</strong> <span th:text="${c.price}"></span></p>
+                            <div class="mt-auto">
+
+                                <!-- STUDENT -->
+                                <a th:href="@{/cart/add/{id}(id=${c.id})}" class="btn btn-success w-100 mb-1"
+                                    sec:authorize="hasAuthority('ROLE_STUDENT')">
+                                    Add to Cart
+                                </a>
+
+                                <!-- ADMIN -->
+                                <a th:href="@{/admin/courses/edit/{id}(id=${c.id})}" class="btn btn-warning w-100 mb-1"
+                                    sec:authorize="hasAuthority('ROLE_ADMIN')">
+                                    Edit
+                                </a>
+
+                                <a th:href="@{/admin/courses/delete/{id}(id=${c.id})}" class="btn btn-danger w-100"
+                                    onclick="return confirm('Xóa course này?')"
+                                    sec:authorize="hasAuthority('ROLE_ADMIN')">
+                                    Delete
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- PAGINATION -->
+            <nav th:if="${totalPages > 1}">
+                <ul class="pagination">
+
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/home(page=${currentPage - 1}, sort=${sort})}"
+                            th:if="${currentPage > 0}">Previous</a>
+                        <span class="page-link" th:unless="${currentPage > 0}">Previous</span>
+                    </li>
+
+                    <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${pageNum == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/home(page=${pageNum}, sort=${sort})}"
+                            th:text="${pageNum + 1}"></a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/home(page=${currentPage + 1}, sort=${sort})}"
+                            th:if="${currentPage < totalPages - 1}">Next</a>
+                        <span class="page-link" th:unless="${currentPage < totalPages - 1}">Next</span>
+                    </li>
+
+                </ul>
+            </nav>
+
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <span>© 2026 Course Registration System | J2EE Course Project</span>
+    </footer>
+
+</body>
+
+</html>
